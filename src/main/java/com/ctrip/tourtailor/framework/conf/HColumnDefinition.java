@@ -14,7 +14,7 @@ public class HColumnDefinition {
     private String colummName;
     private String columnFamily;
 
-    private String fieldName;
+    private Field field;
     private Class<?> fieldType;
 
     private boolean isRowkey;
@@ -27,7 +27,7 @@ public class HColumnDefinition {
             String [] familyAndName = getFamilyAndColumnName(field);
             hdc.setColumnFamily(familyAndName[0]);
             hdc.setColummName(familyAndName[1]);
-            hdc.setFieldName(field.getName());
+            hdc.setField(field);
             hdc.setFieldType(field.getType());
             return hdc;
         }
@@ -77,12 +77,12 @@ public class HColumnDefinition {
         this.timestamp = timestamp;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public Field getField() {
+        return field;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setField(Field field) {
+        this.field = field;
     }
 
     public boolean getIsRowkey() {

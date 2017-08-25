@@ -15,5 +15,5 @@ public @interface HTable {
     /**
      * 映射的Hbase表名
      */
-    String name() default "";
+    String value() default "";
 }
