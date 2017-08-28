@@ -283,5 +283,9 @@ public class HCriteria {
             aggregationOperation.setCloumnName(columnName);
             return this;
         }
+
+        public HCriteria build(){
+            return new HCriteria(aggregationOperation);
+        }
     }
 }

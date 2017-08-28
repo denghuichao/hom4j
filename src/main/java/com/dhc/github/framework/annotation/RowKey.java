@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * Created by hcdeng on 17-8-25.
  * 功能描述：标注HBase表的rowkey
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RowKey {
 

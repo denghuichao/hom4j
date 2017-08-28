@@ -1,6 +1,7 @@
 package com.dhc.github.framework;
 
 import com.dhc.github.framework.parser.TypeParsers;
+import com.dhc.github.framework.pos.Book;
 import org.junit.Assert;
 import org.junit.Test;
 

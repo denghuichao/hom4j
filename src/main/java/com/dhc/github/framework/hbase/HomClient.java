@@ -25,7 +25,6 @@ import org.apache.hadoop.hbase.util.Bytes;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by hcdeng on 17-8-25.
@@ -294,10 +293,16 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
     public <T> void deleteList(List<T> poList) throws HomException {
         if(poList != null){
             if(poList.size() > 0){
-                Class<?> type = poList.get(0).getClass();
-                List<byte[]> rowKeys = poList.stream().map(e -> HBaseUtil.getRowKeyBytes(e))
-                        .collect(Collectors.toList());
-                deleteList(rowKeys, type);
+                try {
+                    Class<?> type = poList.get(0).getClass();
+                    List<byte[]> rowKeys = Lists.newArrayList();
+                    for(T t: poList){
+                        rowKeys.add(HBaseUtil.getRowKeyBytes(t));
+                    }
+                    deleteList(rowKeys, type);
+                }catch (Throwable e){
+                    throw new HomException(e);
+                }
             }
         }
         throw new IllegalArgumentException("po list must not be null");

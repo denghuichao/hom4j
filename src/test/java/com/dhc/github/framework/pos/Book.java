@@ -4,9 +4,10 @@
  * Project        : horm
  * File Name      : Book.java
  */
-package com.dhc.github.framework;
+package com.dhc.github.framework.pos;
 
 import com.dhc.github.framework.annotation.Column;
+import com.dhc.github.framework.annotation.RowKey;
 import com.dhc.github.framework.annotation.Table;
 
 import java.io.Serializable;
@@ -21,6 +22,9 @@ import java.io.Serializable;
 @Table("book")
 public class Book implements Serializable{
 
+    @RowKey
+    private int bookId;
+
     @Column(family = "info", name = "bookName")
     private String bookName;
 
@@ -29,6 +33,14 @@ public class Book implements Serializable{
 
     @Column(family = "info", name = "desc")
     private String desc;
+
+    public int getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
 
     public String getBookName() {
         return bookName;

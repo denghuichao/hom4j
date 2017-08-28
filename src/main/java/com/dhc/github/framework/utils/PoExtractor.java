@@ -15,7 +15,9 @@ import java.util.List;
  */
 public class PoExtractor {
 
-    private PoExtractor(){throw new InstantiationError("util class can not be instantiated");}
+    private PoExtractor() {
+        throw new InstantiationError("util class can not be instantiated");
+    }
 
 
     public static <T> T extract(Result result, Class<T> poType) {
@@ -23,11 +25,13 @@ public class PoExtractor {
     }
 
     public static <T> List<T> extract(Result[] results, Class<T> poType) {
-        List<HColumnDefinition> hcds = HBaseUtil.getHColumnDefinitions(poType);
-        HColumnDefinition rowkey = HBaseUtil.getRowKey(hcds);
         List<T> res = Lists.newArrayList();
-        for(Result result: results) {
-            try {
+        try {
+            List<HColumnDefinition> hcds = HBaseUtil.getHColumnDefinitions(poType);
+            HColumnDefinition rowkey = HBaseUtil.getRowKey(hcds);
+
+            for (Result result : results) {
+
                 T t = poType.newInstance();
                 rowkey.getField().set(t, TypeParsers.fromBytes(rowkey.getFieldType(), result.getRow()));
                 for (HColumnDefinition hcd : hcds) {
@@ -36,9 +40,9 @@ public class PoExtractor {
                     hcd.getField().set(t, TypeParsers.fromBytes(hcd.getFieldType(), CellUtil.cloneValue(cell)));
                 }
                 res.add(t);
-            }catch (Throwable e){
-                throw new RuntimeException(e);
             }
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
         return res;
     }

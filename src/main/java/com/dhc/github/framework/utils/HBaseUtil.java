@@ -2,9 +2,12 @@ package com.dhc.github.framework.utils;
 
 import com.dhc.github.framework.annotation.Table;
 import com.dhc.github.framework.conf.HColumnDefinition;
+import com.dhc.github.framework.exception.HomException;
 import com.dhc.github.framework.parser.TypeParsers;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -16,62 +19,71 @@ import java.util.stream.Collectors;
  */
 public class HBaseUtil {
 
-    private HBaseUtil(){throw new InstantiationError("util class can not be instantiated");}
+    private HBaseUtil() {
+        throw new InstantiationError("util class can not be instantiated");
+    }
 
     /**
      * Cache the HColumnDefinition of htables
      */
     private static Map<Class<?>, List<HColumnDefinition>> HCDS = new HashMap<>();
 
-    public static List<HColumnDefinition> getHColumnDefinitions(Class<?> poType) {
-        if(HCDS.containsKey(poType))
+    public static List<HColumnDefinition> getHColumnDefinitions(Class<?> poType) throws HomException {
+        if (HCDS.containsKey(poType))
             return HCDS.get(poType);
 
-        List<HColumnDefinition> hcd = Arrays.stream(poType.getDeclaredFields()).map(f -> HColumnDefinition.parse(f))
-                .filter(e -> e != null).collect(Collectors.toList());
+        if (!poType.isAnnotationPresent(Table.class))
+            throw new HomException(poType.getName() + " is not annotated as htable");
 
-        HCDS.put(poType, hcd);
+        List<HColumnDefinition> hcds = Lists.newArrayList();
+        for (Field field : poType.getDeclaredFields()) {
+            HColumnDefinition hcd = HColumnDefinition.parse(field);
+            if (hcd != null) hcds.add(hcd);
+        }
 
-        return hcd;
+        HCDS.put(poType, hcds);
+
+        return hcds;
     }
 
-    public static <T> List<HColumnDefinition> getHColumnDefinitions(T po) {
-        if(po != null)
+    public static <T> List<HColumnDefinition> getHColumnDefinitions(T po) throws HomException {
+        if (po != null)
             return getHColumnDefinitions(po.getClass());
 
         throw new IllegalArgumentException("po must not be null");
     }
 
-    public static HColumnDefinition getRowKey(List<HColumnDefinition> hcds) {
-        return hcds.stream().filter(e -> e.getIsRowkey()).findFirst().orElse(null);
+    public static HColumnDefinition getRowKey(List<HColumnDefinition> hcds) throws HomException {
+        return hcds.stream().filter(e -> e.getIsRowkey()).findFirst().
+                orElseThrow(() -> new HomException("rowkey is not defined"));
     }
 
-    public static <T> HColumnDefinition getRowKey(T po) {
+    public static <T> HColumnDefinition getRowKey(T po) throws HomException {
         return getRowKey(getHColumnDefinitions(po));
     }
 
-    public static HColumnDefinition getRowKey(Class<?> poType) {
+    public static HColumnDefinition getRowKey(Class<?> poType) throws HomException {
         return getRowKey(getHColumnDefinitions(poType));
     }
 
-    public static <T> String getHTableName(Class<T> type){
-        if(type.isAnnotationPresent(Table.class)){
+    public static <T> String getHTableName(Class<T> type) throws HomException {
+        if (type.isAnnotationPresent(Table.class)) {
             Table annotation = type.getAnnotation(Table.class);
             String tname = annotation.value();
             return Strings.isNullOrEmpty(tname) ? type.getName() : tname;
         }
-        throw new IllegalArgumentException(type.getName() + " is not annotated as an htable");
+        throw new HomException(type.getName() + " is not annotated as an htable");
     }
 
-    public static <T> String getHTableName(T po){
-        if(po != null)
+    public static <T> String getHTableName(T po) throws HomException {
+        if (po != null)
             getHTableName(po.getClass());
 
-        throw new IllegalArgumentException("po must not be null");
+        throw new HomException("po must not be null");
     }
 
-    public static <T> byte[] getRowKeyBytes(T po) {
-        if(po != null) {
+    public static <T> byte[] getRowKeyBytes(T po) throws HomException {
+        if (po != null) {
             HColumnDefinition rk = getRowKey(po);
             if (rk != null) {
                 try {
@@ -80,7 +92,7 @@ public class HBaseUtil {
                     throw new RuntimeException(e);
                 }
             }
-            throw new RuntimeException("there is not rowkey defined in " + po.getClass());
+            throw new HomException("there is not rowkey defined in " + po.getClass());
         }
         throw new IllegalArgumentException("po must not be null");
     }
