@@ -16,7 +16,7 @@ import java.util.List;
 public class PoExtractor {
 
     private PoExtractor() {
-        throw new InstantiationError("util class can not be instantiated");
+        throw new RuntimeException("util class can not be instantiated");
     }
 
 

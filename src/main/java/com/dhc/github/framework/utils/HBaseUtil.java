@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class HBaseUtil {
 
     private HBaseUtil() {
-        throw new InstantiationError("util class can not be instantiated");
+        throw new RuntimeException("util class can not be instantiated");
     }
 
     /**
