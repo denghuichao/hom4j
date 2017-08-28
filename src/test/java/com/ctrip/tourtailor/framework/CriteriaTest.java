@@ -6,7 +6,7 @@
  */
 package com.ctrip.tourtailor.framework;
 
-import com.ctrip.tourtailor.framework.exception.HOrmException;
+import com.ctrip.tourtailor.framework.exception.HomException;
 import com.ctrip.tourtailor.framework.hbase.criteria.HCriteria;
 import org.junit.Test;
 
@@ -20,11 +20,11 @@ import org.junit.Test;
 public class CriteriaTest {
 
     @Test
-    public void testPutCriteria()throws HOrmException{
+    public void testPutCriteria()throws HomException {
         Book book = new Book();
         book.setBookName("Thinking in java");
         book.setAuthor("hcdeng");
         book.setDesc("good book about java");
-        HCriteria.put(Book.class).putObject(book).build().execute(null);
+        HCriteria.putCriteria(Book.class).putObject(book).build().execute(null);
     }
 }

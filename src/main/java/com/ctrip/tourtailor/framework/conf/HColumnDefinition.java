@@ -1,6 +1,6 @@
 package com.ctrip.tourtailor.framework.conf;
 
-import com.ctrip.tourtailor.framework.annotation.HColumn;
+import com.ctrip.tourtailor.framework.annotation.Column;
 import com.ctrip.tourtailor.framework.annotation.RowKey;
 import org.apache.directory.api.util.Strings;
 
@@ -21,7 +21,7 @@ public class HColumnDefinition {
     private long timestamp;
 
     public static HColumnDefinition parse(Field field){
-        if(field.isAnnotationPresent(RowKey.class) || field.isAnnotationPresent(HColumn.class)) {
+        if(field.isAnnotationPresent(RowKey.class) || field.isAnnotationPresent(Column.class)) {
             HColumnDefinition hdc = new HColumnDefinition();
             hdc.setIsRowkey(isRowKey(field));
             String [] familyAndName = getFamilyAndColumnName(field);
@@ -40,8 +40,8 @@ public class HColumnDefinition {
 
     private static String[] getFamilyAndColumnName(Field field){
         field.setAccessible(true);
-        if(field.isAnnotationPresent(HColumn.class)) {
-            HColumn hc = field.getAnnotation(HColumn.class);
+        if(field.isAnnotationPresent(Column.class)) {
+            Column hc = field.getAnnotation(Column.class);
             String family = hc.family();
             if(Strings.isEmpty(family))
                 throw new IllegalArgumentException("family must not be empty");

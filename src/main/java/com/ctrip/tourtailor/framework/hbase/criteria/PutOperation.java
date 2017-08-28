@@ -7,9 +7,9 @@ import java.util.List;
  */
 class PutOperation<T> extends Operation<T> {
 
-    T po;
+    private T po;
 
-    List<T> poList;
+    private List<T> poList;
 
     public T getPo() {
         return po;

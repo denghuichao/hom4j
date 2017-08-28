@@ -6,8 +6,10 @@
  */
 package com.ctrip.tourtailor.framework;
 
-import com.ctrip.tourtailor.framework.annotation.HColumn;
-import com.ctrip.tourtailor.framework.annotation.HTable;
+import com.ctrip.tourtailor.framework.annotation.Column;
+import com.ctrip.tourtailor.framework.annotation.Table;
+
+import java.io.Serializable;
 
 /**
  * 功能描述:  <p>
@@ -16,16 +18,16 @@ import com.ctrip.tourtailor.framework.annotation.HTable;
  * @version 1.0 2017-08-25
  * @since horm 1.0
  */
-@HTable("book")
-public class Book {
+@Table("book")
+public class Book implements Serializable{
 
-    @HColumn(family = "info", name = "bookName")
+    @Column(family = "info", name = "bookName")
     private String bookName;
 
-    @HColumn(family = "info", name = "author")
+    @Column(family = "info", name = "author")
     private String author;
 
-    @HColumn(family = "info", name = "desc")
+    @Column(family = "info", name = "desc")
     private String desc;
 
     public String getBookName() {
@@ -51,4 +53,5 @@ public class Book {
     public void setDesc(String desc) {
         this.desc = desc;
     }
+
 }

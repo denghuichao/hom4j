@@ -2,7 +2,7 @@ package com.ctrip.tourtailor.framework.hbase.criteria;
 
 import com.ctrip.tourtailor.framework.base.HAggregator;
 import com.ctrip.tourtailor.framework.base.HPersistent;
-import com.ctrip.tourtailor.framework.exception.HOrmException;
+import com.ctrip.tourtailor.framework.exception.HomException;
 import com.ctrip.tourtailor.framework.hbase.HPager;
 import org.apache.directory.api.util.Strings;
 import org.apache.hadoop.hbase.filter.Filter;
@@ -20,73 +20,96 @@ public class HCriteria {
         this.operation = operation;
     }
 
-    public static <T> PutCriteriaBuilder<T> put(Class<T> poType) {
+    /**
+     * 构造一个用于插入记录的Criteria
+     * @param poType PO所属类型
+     * @param <T>
+     * @return
+     */
+    public static <T> PutCriteriaBuilder<T> putCriteria(Class<T> poType) {
         return new PutCriteriaBuilder<>();
     }
 
-    public static <T> QueryCriteriaBuilder<T> find(Class<T> poType) {
+    /**
+     * 构造一个用于查询的Criteria
+     * @param poType PO所属类型
+     * @param <T>
+     * @return
+     */
+    public static <T> QueryCriteriaBuilder<T> findCriteria(Class<T> poType) {
         return new QueryCriteriaBuilder<>();
     }
 
-    public static <T> DeleteCriteriaBuilder<T> delete(Class<T> poType) {
+    /**
+     * 构造一个用于删除记录的Criteria
+     * @param poType PO所属类型
+     * @param <T>
+     * @return
+     */
+    public static <T> DeleteCriteriaBuilder<T> deleteCriteria(Class<T> poType) {
         return new DeleteCriteriaBuilder<>();
     }
 
-    public static <T> AggregationCriteriaBuilder<T> aggregate(Class<T> poType) {
+    /**
+     * 构造一个用于聚合的Criteria
+     * @param poType PO所属类型
+     * @param <T>
+     * @return
+     */
+    public static <T> AggregationCriteriaBuilder<T> aggregateCriteria(Class<T> poType) {
         return new AggregationCriteriaBuilder<>();
     }
 
-    public void execute(HPersistent hPersistent) throws HOrmException {
+    public void execute(HPersistent hPersistent) throws HomException {
 
         if (operation instanceof PutOperation) {
             doPutOperation(hPersistent);
         } else if (operation instanceof DeleteOperation) {
             doDeleteOperation(hPersistent);
         } else {
-            throw new HOrmException("operation " + operation.getClass().getName() +
+            throw new HomException("operation " + operation.getClass().getName() +
                     "does not match return type void");
         }
     }
 
-    private void doDeleteOperation(HPersistent hPersistent) throws HOrmException {
+    private void doDeleteOperation(HPersistent hPersistent) throws HomException {
         DeleteOperation<?> deleteOperation = (DeleteOperation<?>) operation;
         if (deleteOperation.getRowKey() != null) {
-            hPersistent.delete(deleteOperation.getRowKey(), deleteOperation.getPoType());
+            hPersistent.deleteOne(deleteOperation.getRowKey(), deleteOperation.getPoType());
         } else if (deleteOperation.getRowKeys() != null) {
-            hPersistent.delete(deleteOperation.getRowKeys(), deleteOperation.getPoType());
+            hPersistent.deleteList(deleteOperation.getRowKeys(), deleteOperation.getPoType());
         } else if (deleteOperation.getPo() != null) {
-            hPersistent.delete(deleteOperation.getPo());
+            hPersistent.deleteOne(deleteOperation.getPo());
         } else if (deleteOperation.getPoList() != null) {
-            hPersistent.delete(deleteOperation.getPoList());
+            hPersistent.deleteList(deleteOperation.getPoList());
         } else {
-            throw new HOrmException("delete operation is not correctly built");
+            throw new HomException("deleting operation is not correctly built");
         }
     }
 
-    private void doPutOperation(HPersistent hPersistent) throws HOrmException {
+    private void doPutOperation(HPersistent hPersistent) throws HomException {
         PutOperation<?> putOperation = (PutOperation<?>) operation;
         if (putOperation.getPo() != null) {
-            hPersistent.put(putOperation.getPo());
+            hPersistent.putOne(putOperation.getPo());
         } else if (putOperation.getPoList() != null) {
-            hPersistent.put(putOperation.getPoList());
+            hPersistent.putOne(putOperation.getPoList());
         } else {
-            throw new HOrmException("query operation is not correctly built");
+            throw new HomException("queryOne operation is not correctly built");
         }
     }
 
-    public long count(HAggregator hAggregator) throws HOrmException {
+    public long count(HAggregator hAggregator) throws HomException {
         if (operation instanceof AggregationOperation) {
             AggregationOperation<?> op = (AggregationOperation<?>) operation;
             if (op.getStartRow() != null && op.getEndRow() != null) {
                 return hAggregator.count(op.getStartRow(), op.getEndRow(), op.getPoType(), op.getFilters());
             }
-
-            throw new HOrmException("aggregation operation is not correctly built");
+            throw new HomException("aggregation operation is not correctly built");
         }
-        throw new HOrmException("operation does not match");
+        throw new HomException("operation does not match");
     }
 
-    public double sum(HAggregator hAggregator) throws HOrmException {
+    public double sum(HAggregator hAggregator) throws HomException {
         if (operation instanceof AggregationOperation) {
             AggregationOperation<?> op = (AggregationOperation<?>) operation;
             if (op.getStartRow() != null && op.getEndRow() != null
@@ -94,23 +117,23 @@ public class HCriteria {
                 return hAggregator.sum(op.getStartRow(), op.getEndRow(), op.getPoType(),
                         op.getCloumnName(), op.getFilters());
             }
-            throw new HOrmException("aggregation operation is not correctly built");
+            throw new HomException("aggregation operation is not correctly built");
         }
-        throw new HOrmException("operation does not match");
+        throw new HomException("operation does not match");
     }
 
-    public <T> T query(HPersistent hPersistent) throws HOrmException {
+    public <T> T query(HPersistent hPersistent) throws HomException {
         if (operation instanceof QueryOperation) {
             QueryOperation<T> op = (QueryOperation<T>) operation;
             if (op.getRowKey() == null) {
-                throw new HOrmException("rowkey must be set for this operation");
+                throw new HomException("rowkey must be set for this operation");
             }
-            return hPersistent.query(op.getRowKey(), op.getPoType());
+            return hPersistent.queryOne(op.getRowKey(), op.getPoType());
         }
-        throw new HOrmException("operation does not match");
+        throw new HomException("operation does not match");
     }
 
-    public <T> List<T> queryList(HPersistent hPersistent) throws HOrmException {
+    public <T> List<T> queryList(HPersistent hPersistent) throws HomException {
         if (operation instanceof QueryOperation) {
             QueryOperation<T> op = (QueryOperation<T>) operation;
             if (op.getRowKeys() != null) {
@@ -119,21 +142,21 @@ public class HCriteria {
                 return hPersistent.queryList(op.getFromRow(), op.getEndRow(), op.getPoType());
             }
 
-            throw new HOrmException("query operation is not correctly built");
+            throw new HomException("queryOne operation is not correctly built");
         }
-        throw new HOrmException("operation does not match");
+        throw new HomException("operation does not match");
     }
 
-    public <T> HPager<T> queryByPage(HPersistent hPersistent) throws HOrmException {
+    public <T> HPager<T> queryByPage(HPersistent hPersistent) throws HomException {
         if (operation instanceof QueryOperation) {
             QueryOperation<T> op = (QueryOperation<T>) operation;
             if (op.getPager() != null) {
                 return hPersistent.queryByPage(op.getPager(), op.getFilters());
             }
 
-            throw new HOrmException("pager must be set for this operation");
+            throw new HomException("pager must be set for this operation");
         }
-        throw new HOrmException("operation does not match");
+        throw new HomException("operation does not match");
     }
 
     public static class PutCriteriaBuilder<T> {

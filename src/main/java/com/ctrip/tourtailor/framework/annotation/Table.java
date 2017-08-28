@@ -7,19 +7,13 @@ import java.lang.annotation.Target;
 
 /**
  * Created by hcdeng on 17-8-25.
- * 功能描述：Hbase列映射注解
+ * 功能: HBASE表注解
  */
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HColumn {
-
+public @interface Table {
     /**
-     * 映射的Hbase列族
+     * 映射的Hbase表名
      */
-    String family()  default "";
-
-    /**
-     * 映射的HBase列名
-     */
-    String name() default "";
+    String value() default "";
 }

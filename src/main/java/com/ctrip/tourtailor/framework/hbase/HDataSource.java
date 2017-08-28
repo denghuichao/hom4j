@@ -1,6 +1,6 @@
 package com.ctrip.tourtailor.framework.hbase;
 
-import com.ctrip.tourtailor.framework.exception.HOrmException;
+import com.ctrip.tourtailor.framework.exception.HomException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
@@ -14,38 +14,38 @@ public class HDataSource {
     private Configuration config;
     private Connection connection;
 
-    public HDataSource(Configuration config) throws HOrmException{
+    public HDataSource(Configuration config) throws HomException {
         this.config = config;
         try {
             connection = ConnectionFactory.createConnection(config);
         }catch (IOException e){
-            throw new HOrmException(e);
+            throw new HomException(e);
         }
     }
 
 
-    public Table getTable(String tableName)throws HOrmException{
+    public Table getTable(String tableName)throws HomException {
         try {
             return getConnection().getTable(TableName.valueOf(tableName));
         }catch (IOException e){
-            throw new HOrmException(e);
+            throw new HomException(e);
         }
     }
 
-    public Admin getHBaseAdmin()throws HOrmException{
+    public Admin getHBaseAdmin()throws HomException {
         try {
             return getConnection().getAdmin();
         }catch (IOException e){
-            throw new HOrmException(e);
+            throw new HomException(e);
         }
     }
 
-    public void closeTable(Table table)throws HOrmException{
+    public void closeTable(Table table)throws HomException {
         if(table != null){
             try {
                 table.close();
             }catch (IOException e){
-                throw new HOrmException(e);
+                throw new HomException(e);
             }
         }
     }
@@ -57,6 +57,5 @@ public class HDataSource {
     public Connection getConnection() {
         return connection;
     }
-
 
 }

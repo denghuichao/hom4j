@@ -1,5 +1,6 @@
 package com.ctrip.tourtailor.framework.hbase;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 /**
@@ -12,9 +13,10 @@ public class HPager<T> {
 
     private int pageNumber;     // 页面编号
     private int pageSize;       // 每页条数
-    private long totalRecord;   // 总记录数
-    private long totalPage;     // 总页面数
     private List<T> recordList; // 数据列表
+
+    public HPager() {
+    }
 
     /**
      * 该构造函数用来构造一个分页查询的请求
@@ -38,11 +40,32 @@ public class HPager<T> {
     public HPager(int pageNumber, int pageSize, long totalRecord, List<T> recordList) {
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
-        this.totalRecord = totalRecord;
         this.recordList = recordList;
-        if (pageSize != 0) {
-            totalPage = totalRecord % pageSize == 0 ? totalRecord / pageSize : totalRecord / pageSize + 1;
-        }
+    }
+
+    protected Class<?> getGenericType() {
+        return (Class<?>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+
+    public void setStartRow(byte[] startRow) {
+        this.startRow = startRow;
+    }
+
+    public void setStopRow(byte[] stopRow) {
+        this.stopRow = stopRow;
+    }
+
+    public void setPageNumber(int pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+
+    public void setRecordList(List<T> recordList) {
+        this.recordList = recordList;
     }
 
     public byte[] getStartRow() {
@@ -61,13 +84,6 @@ public class HPager<T> {
         return pageSize;
     }
 
-    public long getTotalRecord() {
-        return totalRecord;
-    }
-
-    public long getTotalPage() {
-        return totalPage;
-    }
 
     public List<T> getRecordList() {
         return recordList;
@@ -77,15 +93,4 @@ public class HPager<T> {
         return pageNumber == 0;
     }
 
-    public boolean isLastPage() {
-        return pageNumber == totalPage - 1;
-    }
-
-    public boolean hasPrevPage() {
-        return pageNumber > 0 && pageNumber < totalPage;
-    }
-
-    public boolean hasNextPage() {
-        return pageNumber < totalPage - 1;
-    }
 }

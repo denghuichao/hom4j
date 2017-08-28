@@ -1,6 +1,6 @@
 package com.ctrip.tourtailor.framework.base;
 
-import com.ctrip.tourtailor.framework.exception.HOrmException;
+import com.ctrip.tourtailor.framework.exception.HomException;
 import org.apache.hadoop.hbase.filter.Filter;
 
 /**
@@ -8,11 +8,7 @@ import org.apache.hadoop.hbase.filter.Filter;
  */
 public interface HAggregator {
 
-    long count(byte[] startRow, byte[] endRow, Class<?> poType)throws HOrmException;
+    long count(byte[] startRow, byte[] endRow, Class<?> poType, Filter... filters)throws HomException;
 
-    long count(byte[] startRow, byte[] endRow, Class<?> poType, Filter... filters)throws HOrmException;
-
-    double sum(byte[] startRow, byte[] endRow, Class<?> poType, String columnName)throws HOrmException;
-
-    double sum(byte[] startRow, byte[] endRow, Class<?> poType, String columnName, Filter ... filters)throws HOrmException;
+    double sum(byte[] startRow, byte[] endRow, Class<?> poType, String columnName, Filter ... filters)throws HomException;
 }
