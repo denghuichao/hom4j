@@ -53,9 +53,7 @@ public class CriteriaTest {
         Assert.assertEquals(book.getBookId(), 1234);
         Assert.assertEquals(book.getAuthor(),"hcdeng");
         Assert.assertEquals(book.getDesc(),"good book about java");
-        Assert.assertEquals(book.getBookName(),gitgit
-
-                git"Thinking in java");
+        Assert.assertEquals(book.getBookName(),"Thinking in java");
     }
 
     @Test
