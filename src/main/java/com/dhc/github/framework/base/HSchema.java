@@ -7,8 +7,8 @@ import com.dhc.github.framework.exception.HomException;
  */
 public interface HSchema {
 
-    void createTable(String tableName, String...columnFamilies)throws HomException;
+    void createTable(String tableName, String...columnFamilies);
 
-    void deleteTable(String tableName)throws HomException;
+    void deleteTable(String tableName);
 
 }

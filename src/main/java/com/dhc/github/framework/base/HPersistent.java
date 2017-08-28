@@ -11,23 +11,23 @@ import java.util.List;
  */
 public interface HPersistent {
 
-    <T> void putOne(T po)throws HomException;
+    <T> void putOne(T po);
 
-    <T> void putList(List<T> poList) throws HomException;
+    <T> void putList(List<T> poList);
 
-    <T> T queryOne(byte[] roeKey, Class<T> poType)throws HomException;
+    <T> T queryOne(byte[] roeKey, Class<T> poType);
 
-    <T> List<T> queryList(List<byte[]> rowKeys, Class<T> poType) throws HomException;
+    <T> List<T> queryList(List<byte[]> rowKeys, Class<T> poType);
 
-    <T> List<T> queryList(byte[] fromRowKey, byte[] endRowKey, Class<T> poType) throws HomException;
+    <T> List<T> queryList(byte[] fromRowKey, byte[] endRowKey, Class<T> poType);
 
-    <T> HPager<T> queryByPage(HPager<T> HPager, Filter ... filters)throws HomException;
+    <T> HPager<T> queryByPage(HPager<T> HPager, Filter ... filters);
 
-    void deleteOne(byte[] rowKey, Class<?> poType) throws HomException;
+    void deleteOne(byte[] rowKey, Class<?> poType);
 
-    void deleteList(List<byte[]> rowKeys, Class<?> poType) throws HomException;
+    void deleteList(List<byte[]> rowKeys, Class<?> poType);
 
-    <T> void deleteOne(T po)throws HomException;
+    <T> void deleteOne(T po);
 
-    <T> void deleteList(List<T> poList)throws HomException;
+    <T> void deleteList(List<T> poList);
 }

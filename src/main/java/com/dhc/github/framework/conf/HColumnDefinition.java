@@ -2,6 +2,7 @@ package com.dhc.github.framework.conf;
 
 import com.dhc.github.framework.annotation.Column;
 import com.dhc.github.framework.annotation.RowKey;
+import com.dhc.github.framework.exception.ColumFamilyNotDefineException;
 import com.dhc.github.framework.exception.HomException;
 import org.apache.directory.api.util.Strings;
 
@@ -21,7 +22,7 @@ public class HColumnDefinition {
     private boolean isRowkey;
     private long timestamp;
 
-    public static HColumnDefinition parse(Field field)throws HomException{
+    public static HColumnDefinition parse(Field field){
         if(field.isAnnotationPresent(RowKey.class) || field.isAnnotationPresent(Column.class)) {
             HColumnDefinition hdc = new HColumnDefinition();
             hdc.setIsRowkey(isRowKey(field));
@@ -39,13 +40,13 @@ public class HColumnDefinition {
         return f.isAnnotationPresent(RowKey.class);
     }
 
-    private static String[] getFamilyAndColumnName(Field field)throws HomException{
+    private static String[] getFamilyAndColumnName(Field field){
         field.setAccessible(true);
         if(field.isAnnotationPresent(Column.class)) {
             Column hc = field.getAnnotation(Column.class);
             String family = hc.family();
             if(Strings.isEmpty(family))
-                throw new HomException("family must not be empty");
+                throw new ColumFamilyNotDefineException("family must not be empty");
 
             String name = hc.name();
             return new String[]{family, Strings.isEmpty(name) ? field.getName() : name};

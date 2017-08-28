@@ -37,7 +37,7 @@ public class CriteriaTest {
     }
 
     @Test
-    public void testPutCriteria()throws HomException {
+    public void testPutCriteria() {
         Book book = new Book();
         book.setBookId(1234);
         book.setBookName("Thinking in java");
@@ -48,7 +48,7 @@ public class CriteriaTest {
     }
 
     @Test
-    public void testQueryCriteria()throws HomException{
+    public void testQueryCriteria(){
         Book book = HCriteria.findCriteria(Book.class).byRowKey(TypeParsers.toBytes(1234)).build().query(homClient);
         Assert.assertEquals(book.getBookId(), 1234);
         Assert.assertEquals(book.getAuthor(),"hcdeng");
@@ -57,14 +57,14 @@ public class CriteriaTest {
     }
 
     @Test
-    void testAggregationCriteria() throws HomException{
+    void testAggregationCriteria(){
        long count = HCriteria.aggregateCriteria(Book.class).fromRow(TypeParsers.toBytes(1234)).toRow(TypeParsers.toBytes(1245))
                 .build().count(homClient);
        Assert.assertEquals(count, 1);
     }
 
     @Test
-    void testDeleteCriteria() throws HomException{
+    void testDeleteCriteria(){
        HCriteria.deleteCriteria(Book.class).byRowKey(TypeParsers.toBytes(1234)).build().execute(homClient);
     }
 }

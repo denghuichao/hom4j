@@ -60,7 +60,7 @@ public class HCriteria {
         return new AggregationCriteriaBuilder<>();
     }
 
-    public void execute(HPersistent hPersistent) throws HomException {
+    public void execute(HPersistent hPersistent) {
 
         if (operation instanceof PutOperation) {
             doPutOperation(hPersistent);
@@ -72,7 +72,7 @@ public class HCriteria {
         }
     }
 
-    private void doDeleteOperation(HPersistent hPersistent) throws HomException {
+    private void doDeleteOperation(HPersistent hPersistent) {
         DeleteOperation<?> deleteOperation = (DeleteOperation<?>) operation;
         if (deleteOperation.getRowKey() != null) {
             hPersistent.deleteOne(deleteOperation.getRowKey(), deleteOperation.getPoType());
@@ -87,7 +87,7 @@ public class HCriteria {
         }
     }
 
-    private void doPutOperation(HPersistent hPersistent) throws HomException {
+    private void doPutOperation(HPersistent hPersistent) {
         PutOperation<?> putOperation = (PutOperation<?>) operation;
         if (putOperation.getPo() != null) {
             hPersistent.putOne(putOperation.getPo());
@@ -98,7 +98,7 @@ public class HCriteria {
         }
     }
 
-    public long count(HAggregator hAggregator) throws HomException {
+    public long count(HAggregator hAggregator) {
         if (operation instanceof AggregationOperation) {
             AggregationOperation<?> op = (AggregationOperation<?>) operation;
             if (op.getStartRow() != null && op.getEndRow() != null) {
@@ -109,7 +109,7 @@ public class HCriteria {
         throw new HomException("operation does not match");
     }
 
-    public double sum(HAggregator hAggregator) throws HomException {
+    public double sum(HAggregator hAggregator) {
         if (operation instanceof AggregationOperation) {
             AggregationOperation<?> op = (AggregationOperation<?>) operation;
             if (op.getStartRow() != null && op.getEndRow() != null
@@ -122,7 +122,7 @@ public class HCriteria {
         throw new HomException("operation does not match");
     }
 
-    public <T> T query(HPersistent hPersistent) throws HomException {
+    public <T> T query(HPersistent hPersistent) {
         if (operation instanceof QueryOperation) {
             QueryOperation<T> op = (QueryOperation<T>) operation;
             if (op.getRowKey() == null) {
@@ -133,7 +133,7 @@ public class HCriteria {
         throw new HomException("operation does not match");
     }
 
-    public <T> List<T> queryList(HPersistent hPersistent) throws HomException {
+    public <T> List<T> queryList(HPersistent hPersistent) {
         if (operation instanceof QueryOperation) {
             QueryOperation<T> op = (QueryOperation<T>) operation;
             if (op.getRowKeys() != null) {
@@ -147,7 +147,7 @@ public class HCriteria {
         throw new HomException("operation does not match");
     }
 
-    public <T> HPager<T> queryByPage(HPersistent hPersistent) throws HomException {
+    public <T> HPager<T> queryByPage(HPersistent hPersistent)  {
         if (operation instanceof QueryOperation) {
             QueryOperation<T> op = (QueryOperation<T>) operation;
             if (op.getPager() != null) {

@@ -4,7 +4,7 @@ package com.dhc.github.framework.exception;
  * Created by hcdeng on 17-8-25.
  * HORM框架向外抛出的异常
  */
-public class HomException extends Exception{
+public class HomException extends RuntimeException{
 
     public HomException(){
         super();

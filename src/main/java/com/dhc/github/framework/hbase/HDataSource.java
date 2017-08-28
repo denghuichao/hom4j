@@ -14,7 +14,7 @@ public class HDataSource {
     private Configuration config;
     private Connection connection;
 
-    public HDataSource(Configuration config) throws HomException {
+    public HDataSource(Configuration config) {
         this.config = config;
         try {
             connection = ConnectionFactory.createConnection(config);
@@ -24,7 +24,7 @@ public class HDataSource {
     }
 
 
-    public Table getTable(String tableName)throws HomException {
+    public Table getTable(String tableName) {
         try {
             return getConnection().getTable(TableName.valueOf(tableName));
         }catch (IOException e){
@@ -32,7 +32,7 @@ public class HDataSource {
         }
     }
 
-    public Admin getHBaseAdmin()throws HomException {
+    public Admin getHBaseAdmin() {
         try {
             return getConnection().getAdmin();
         }catch (IOException e){
@@ -40,7 +40,7 @@ public class HDataSource {
         }
     }
 
-    public void closeTable(Table table)throws HomException {
+    public void closeTable(Table table) {
         if(table != null){
             try {
                 table.close();

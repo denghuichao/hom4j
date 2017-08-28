@@ -8,7 +8,7 @@ import org.apache.hadoop.hbase.filter.Filter;
  */
 public interface HAggregator {
 
-    long count(byte[] startRow, byte[] endRow, Class<?> poType, Filter... filters)throws HomException;
+    long count(byte[] startRow, byte[] endRow, Class<?> poType, Filter... filters);
 
-    double sum(byte[] startRow, byte[] endRow, Class<?> poType, String columnName, Filter ... filters)throws HomException;
+    double sum(byte[] startRow, byte[] endRow, Class<?> poType, String columnName, Filter ... filters);
 }

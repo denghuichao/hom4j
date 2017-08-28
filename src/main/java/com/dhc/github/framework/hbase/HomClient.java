@@ -6,6 +6,8 @@ import com.dhc.github.framework.base.HDataSourceAware;
 import com.dhc.github.framework.base.HPersistent;
 import com.dhc.github.framework.conf.HColumnDefinition;
 import com.dhc.github.framework.exception.HomException;
+import com.dhc.github.framework.exception.NotAColumnException;
+import com.dhc.github.framework.exception.NotATableException;
 import com.dhc.github.framework.parser.TypeParsers;
 import com.dhc.github.framework.utils.HBaseUtil;
 import com.dhc.github.framework.utils.PoExtractor;
@@ -22,6 +24,7 @@ import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.PageFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -58,8 +61,8 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
 
 
     @Override
-    public long count(byte[] startRow, byte[] endRow, Class<?> po, Filter... filters) throws HomException {
-        if(startRow != null && endRow != null && po!= null) {
+    public long count(byte[] startRow, byte[] endRow, Class<?> po, Filter... filters) {
+        if (startRow != null && endRow != null && po != null) {
             Scan scan = buildScan(startRow, endRow, PAGE_SIZE_NO_LIMIT, filters);
             LongColumnInterpreter columnInterpreter = new LongColumnInterpreter();
             AggregationClient aggregationClient = buildAggregationClient();
@@ -101,8 +104,8 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
 
 
     @Override
-    public double sum(byte[] startRow, byte[] endRow, Class<?> po, String propertyName, Filter... filters) throws HomException {
-        if(startRow != null && endRow != null && po != null && propertyName != null) {
+    public double sum(byte[] startRow, byte[] endRow, Class<?> po, String propertyName, Filter... filters) {
+        if (startRow != null && endRow != null && po != null && propertyName != null) {
             Scan scan = buildScan(startRow, endRow, PAGE_SIZE_NO_LIMIT, filters);
             AggregationClient aggregationClient = buildAggregationClient();
             DoubleColumnInterpreter doubleColumnInterpreter = new DoubleColumnInterpreter();
@@ -121,8 +124,7 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
             throws NoSuchFieldException, SecurityException, HomException {
         Field sumField = po.getDeclaredField(propertyName);
         if (!sumField.isAnnotationPresent(Column.class)) {
-            throw new HomException("field :[" + propertyName
-                    + "] is not annotated as an hcolumn");
+            throw new NotAColumnException("field :[" + propertyName + "] is not annotated as an hcolumn");
         }
         Column column = sumField.getAnnotation(Column.class);
 
@@ -132,19 +134,21 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
     }
 
     @Override
-    public <T> void putOne(T po) throws HomException {
-        if(po != null) {
-            try (Table table = getHDataSource().getTable(HBaseUtil.getHTableName(po))) {
-                Put put = buildPut(Arrays.asList(po)).get(0);
+    public <T> void putOne(T po) {
+        if (po != null) {
+            Table table = getHDataSource().getTable(HBaseUtil.getHTableName(po));
+            Put put = buildPut(Arrays.asList(po)).get(0);
+            try {
                 table.put(put);
             } catch (Throwable e) {
                 throw new HomException(e);
             }
+
         }
         throw new IllegalArgumentException("po object must not be null");
     }
 
-    private <T> List<Put> buildPut(List<T> pos) throws HomException {
+    private <T> List<Put> buildPut(List<T> pos) {
         if (CollectionUtils.isEmpty(pos))
             return Lists.newArrayList();
 
@@ -156,7 +160,6 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
                 byte[] rowKey = TypeParsers.toBytes(rowKeyhcd.getField().get(t));
                 Put put = new Put(rowKey);
                 for (HColumnDefinition colDef : columnInfoList) {
-
                     if (colDef.getField().get(t) != null) {
                         byte[] fieldValue = TypeParsers.toBytes(colDef.getField().get(t));
 
@@ -165,7 +168,7 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
                     }
                 }
                 puts.add(put);
-            }catch (Throwable e){
+            } catch (Throwable e) {
                 throw new HomException(e);
             }
         }
@@ -173,24 +176,26 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
     }
 
     @Override
-    public <T> void putList(List<T> poList) throws HomException {
-        if(CollectionUtils.isNotEmpty(poList)) {
-            try (Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poList.get(0)))) {
-                List<Put> puts = buildPut(poList);
+    public <T> void putList(List<T> poList) {
+        if (CollectionUtils.isNotEmpty(poList)) {
+            Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poList.get(0)));
+            List<Put> puts = buildPut(poList);
+            try {
                 table.put(puts);
-            } catch (Throwable e) {
+            } catch (IOException e) {
                 throw new HomException(e);
             }
         }
     }
 
     @Override
-    public <T> T queryOne(byte[] rowKey, Class<T> poType) throws HomException {
-        if(rowKey != null && poType != null) {
-            try (Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType))) {
-                Get get = new Get(rowKey);
+    public <T> T queryOne(byte[] rowKey, Class<T> poType) {
+        if (rowKey != null && poType != null) {
+            Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType));
+            Get get = new Get(rowKey);
+            try {
                 return PoExtractor.extract(table.get(get), poType);
-            } catch (Throwable e) {
+            } catch (IOException e) {
                 throw new HomException(e);
             }
         }
@@ -198,35 +203,35 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
     }
 
 
-
     @Override
-    public <T> List<T> queryList(List<byte[]> rowKeys, Class<T> poType) throws HomException {
-        if(rowKeys != null && poType != null){
-            try (Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType))) {
-                List<Get> gets = Lists.newArrayList();
-                for(byte[] rowkey: rowKeys){
-                    Get get = new Get(rowkey);
-                    gets.add(get);
-                }
+    public <T> List<T> queryList(List<byte[]> rowKeys, Class<T> poType) {
+        if (rowKeys != null && poType != null) {
+            Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType));
+            List<Get> gets = Lists.newArrayList();
+            rowKeys.forEach(rowKey -> gets.add(new Get(rowKey)));
+
+            try {
                 return PoExtractor.extract(table.get(gets), poType);
-            } catch (Throwable e) {
+            } catch (IOException e) {
                 throw new HomException(e);
             }
+
         }
         throw new IllegalArgumentException("po rowkeys and poType must not be null");
     }
 
 
     @Override
-    public <T> List<T> queryList(byte[] fromRowKey, byte[] endRowKey, Class<T> poType) throws HomException {
-        if(fromRowKey != null && endRowKey != null && poType != null){
-            try(Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType))){
-                Scan scan =  buildScan(fromRowKey, endRowKey, PAGE_SIZE_NO_LIMIT);
+    public <T> List<T> queryList(byte[] fromRowKey, byte[] endRowKey, Class<T> poType) {
+        if (fromRowKey != null && endRowKey != null && poType != null) {
+            try {
+                Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType));
+                Scan scan = buildScan(fromRowKey, endRowKey, PAGE_SIZE_NO_LIMIT);
                 ResultScanner scanner = table.getScanner(scan);
                 List<T> res = Lists.newArrayList();
                 scanner.forEach(e -> res.add(PoExtractor.extract(e, poType)));
                 return res;
-            }catch (Throwable e){
+            } catch (IOException e) {
                 throw new HomException(e);
             }
         }
@@ -235,74 +240,70 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
 
 
     @Override
-    public <T> HPager<T> queryByPage(HPager<T> hPager, Filter... filters) throws HomException {
+    public <T> HPager<T> queryByPage(HPager<T> hPager, Filter... filters) {
         Scan scan = buildScan(hPager.getStartRow(), hPager.getStopRow(), hPager.getPageSize(), filters);
         List<T> resultList = Lists.newArrayList();
-        try (Table table = getHDataSource().getTable(HBaseUtil.getHTableName(hPager.getGenericType()))) {
+
+        try {
+            Table table = getHDataSource().getTable(HBaseUtil.getHTableName(hPager.getGenericType()));
             ResultScanner scanner = table.getScanner(scan);
-            scanner.forEach(e -> resultList.add((T)PoExtractor.extract(e, hPager.getGenericType())));
+            scanner.forEach(e -> resultList.add((T) PoExtractor.extract(e, hPager.getGenericType())));
             hPager.setRecordList(resultList);
             if (resultList != null && resultList.size() > 0) {
                 // the rowkey of the last po will be the start rowkey of the next page
                 T t = resultList.get(resultList.size() - 1);
                 // make startRow exclusive add a trailing 0 byte
-                hPager.setStartRow(Bytes.add(HBaseUtil.getRowKeyBytes(t), new byte[] {0}));
+                hPager.setStartRow(Bytes.add(HBaseUtil.getRowKeyBytes(t), new byte[]{0}));
             }
             hPager.setPageNumber(hPager.getPageNumber() + 1);
-
-        } catch (Throwable e) {
+            return hPager;
+        } catch (IOException e) {
             throw new HomException(e);
         }
-        return hPager;
     }
 
     @Override
-    public void deleteOne(byte[] rowKey, Class<?> poType) throws HomException {
-        if(rowKey != null && poType != null) {
-           deleteList(Arrays.asList(rowKey), poType);
+    public void deleteOne(byte[] rowKey, Class<?> poType) {
+        if (rowKey != null && poType != null) {
+            deleteList(Arrays.asList(rowKey), poType);
         }
         throw new IllegalArgumentException("po rowkey and poType must not be null");
     }
 
     @Override
-    public void deleteList(List<byte[]> rowKeys, Class<?> poType) throws HomException {
-        if(rowKeys != null && poType != null) {
-            try (Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType))) {
-                List<Delete> deletes = Lists.newArrayList();
-                for(byte[] rowkey: rowKeys){
-                    deletes.add(new Delete(rowkey));
-                }
-                if(deletes.size() > 0)
+    public void deleteList(List<byte[]> rowKeys, Class<?> poType) {
+        if (rowKeys != null && poType != null) {
+            Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType));
+            List<Delete> deletes = Lists.newArrayList();
+            rowKeys.forEach(rowKey -> deletes.add(new Delete(rowKey)));
+
+            if (deletes.size() > 0) {
+                try {
                     table.delete(deletes);
-            } catch (Throwable e) {
-                throw new HomException(e);
+                } catch (IOException e) {
+                    throw new HomException(e);
+                }
             }
         }
         throw new IllegalArgumentException("po rowkeys and poType must not be null");
     }
 
     @Override
-    public <T> void deleteOne(T po) throws HomException {
-        if(po != null){
+    public <T> void deleteOne(T po) {
+        if (po != null)
             deleteList(Arrays.asList(po));
-        }
+
         throw new IllegalArgumentException("po object must not be null");
     }
 
     @Override
-    public <T> void deleteList(List<T> poList) throws HomException {
-        if(poList != null){
-            if(poList.size() > 0){
-                try {
-                    Class<?> type = poList.get(0).getClass();
-                    List<byte[]> rowKeys = Lists.newArrayList();
-                    for(T t: poList){
-                        rowKeys.add(HBaseUtil.getRowKeyBytes(t));
-                    }
-                    deleteList(rowKeys, type);
-                }catch (Throwable e){
-                    throw new HomException(e);
-                }
+    public <T> void deleteList(List<T> poList) {
+        if (poList != null) {
+            if (poList.size() > 0) {
+                Class<?> type = poList.get(0).getClass();
+                List<byte[]> rowKeys = Lists.newArrayList();
+                poList.forEach(t -> rowKeys.add(HBaseUtil.getRowKeyBytes(t)));
+                deleteList(rowKeys, type);
             }
         }
         throw new IllegalArgumentException("po list must not be null");

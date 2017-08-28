@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class ColumDefinitionTest {
     @Test
-    public void testColumDefinitionTest()throws HomException{
+    public void testColumDefinitionTest(){
         List<HColumnDefinition> hColumnDefinitionList = HBaseUtil.getHColumnDefinitions(Book.class);
         Assert.assertEquals(hColumnDefinitionList.size(), 4);
         HColumnDefinition rowKey = HBaseUtil.getRowKey(hColumnDefinitionList);
@@ -25,17 +25,17 @@ public class ColumDefinitionTest {
     }
 
     @Test(expected = HomException.class)
-    public void testColumDefinitionTestNotTable()throws HomException{
+    public void testColumDefinitionTestNotTable(){
         List<HColumnDefinition> hColumnDefinitionList = HBaseUtil.getHColumnDefinitions(Po1.class);
     }
 
     @Test(expected = HomException.class)
-    public void testColumDefinitionTestNotRowKey()throws HomException{
+    public void testColumDefinitionTestNotRowKey(){
         HColumnDefinition rowKey = HBaseUtil.getRowKey(Po2.class);
     }
 
     @Test(expected = HomException.class)
-    public void testColumDefinitionTestNotFamily()throws HomException{
+    public void testColumDefinitionTestNotFamily(){
         HColumnDefinition rowKey = HBaseUtil.getRowKey(Po3.class);
     }
 }
