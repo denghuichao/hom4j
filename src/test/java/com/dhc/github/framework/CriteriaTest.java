@@ -1,0 +1,30 @@
+/*
+ * Create Author  : huichaodeng
+ * Create Date    : 2017-08-25
+ * Project        : horm
+ * File Name      : CriteriaTest.java
+ */
+package com.dhc.github.framework;
+
+import com.dhc.github.framework.exception.HomException;
+import com.dhc.github.framework.hbase.criteria.HCriteria;
+import org.junit.Test;
+
+/**
+ * 功能描述:  <p>
+ *
+ * @author : huichaodeng <p>
+ * @version 1.0 2017-08-25
+ * @since horm 1.0
+ */
+public class CriteriaTest {
+
+    @Test
+    public void testPutCriteria()throws HomException {
+        Book book = new Book();
+        book.setBookName("Thinking in java");
+        book.setAuthor("hcdeng");
+        book.setDesc("good book about java");
+        HCriteria.putCriteria(Book.class).putObject(book).build().execute(null);
+    }
+}
