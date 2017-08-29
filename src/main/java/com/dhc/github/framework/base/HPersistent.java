@@ -16,8 +16,6 @@ public interface HPersistent {
 
     <T> T queryOne(byte[] roeKey, Class<T> poType);
 
-    <T> T queryOne(Object rowKey, Class<T> poType);
-
     <T> List<T> queryList(List<byte[]> rowKeys, Class<T> poType);
 
     <T> List<T> queryList(byte[] fromRowKey, byte[] endRowKey, Class<T> poType);
