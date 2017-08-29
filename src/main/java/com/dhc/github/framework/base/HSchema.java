@@ -1,7 +1,5 @@
 package com.dhc.github.framework.base;
 
-import com.dhc.github.framework.exception.HomException;
-
 /**
  * Created by hcdeng on 17-8-25.
  */

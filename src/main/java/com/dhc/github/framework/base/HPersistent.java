@@ -1,6 +1,5 @@
 package com.dhc.github.framework.base;
 
-import com.dhc.github.framework.exception.HomException;
 import com.dhc.github.framework.hbase.HPager;
 import org.apache.hadoop.hbase.filter.Filter;
 
@@ -16,6 +15,8 @@ public interface HPersistent {
     <T> void putList(List<T> poList);
 
     <T> T queryOne(byte[] roeKey, Class<T> poType);
+
+    <T> T queryOne(Object rowKey, Class<T> poType);
 
     <T> List<T> queryList(List<byte[]> rowKeys, Class<T> poType);
 
