@@ -15,6 +15,7 @@ import com.dhc.github.framework.parser.TypeParsers;
 import com.dhc.github.framework.pos.Book;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -28,10 +29,10 @@ import java.util.Arrays;
  */
 public class CriteriaTest {
 
-    private HomClient homClient;
+    private static HomClient homClient;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws Exception {
         homClient = new HomClient();
         homClient.setHDataSource(new HDataSource(HDataSourceConfig.getConfiguration()));
     }
@@ -57,14 +58,14 @@ public class CriteriaTest {
     }
 
     @Test
-    void testAggregationCriteria(){
+    public void testAggregationCriteria(){
        long count = HCriteria.aggregateCriteria(Book.class).fromRow(TypeParsers.toBytes(1234)).toRow(TypeParsers.toBytes(1245))
                 .build().count(homClient);
        Assert.assertEquals(count, 1);
     }
 
     @Test
-    void testDeleteCriteria(){
+    public void testDeleteCriteria(){
        HCriteria.deleteCriteria(Book.class).byRowKey(TypeParsers.toBytes(1234)).build().execute(homClient);
     }
 }

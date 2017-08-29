@@ -1,5 +1,6 @@
 package com.dhc.github.framework.conf;
 
+import com.dhc.github.framework.exception.HomException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ public class HDataSourceConfig {
     private static void loadConfig() throws IOException {
 
         InputStreamReader inputStream = new InputStreamReader(
-                getClassLoader().getResourceAsStream("hbase.properties"), "UTF-8");
+                getClassLoader().getResourceAsStream("hom4j.properties"), "UTF-8");
 
         Properties properties = new Properties();
         properties.load(inputStream);
@@ -38,8 +39,9 @@ public class HDataSourceConfig {
                 if (config == null) {
                     try {
                         loadConfig();
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         logger.error("get hbase configuration failed", e);
+                        throw new HomException("et hbase configuration failed", e);
                     }
                 }
             }
@@ -51,5 +53,4 @@ public class HDataSourceConfig {
     private static ClassLoader getClassLoader() {
         return Thread.currentThread().getContextClassLoader();
     }
-
 }
