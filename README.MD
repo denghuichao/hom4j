@@ -1,6 +1,6 @@
 ## hom4j
 
-### hom4j(hbase-object-mapping for Java)是一个轻量级的HBASE和Java对象映射框架。
+ hom4j(hbase-object-mapping for Java)是一个轻量级的HBASE和Java对象映射框架。
 
 ### 使用方法
 #### 在resource下提供hom4j.properties配置文件，主要提供hbase相关设置。常用配置：
@@ -9,9 +9,6 @@
   zookeeper.znode.parent=/hbase
   hbase.zookeeper.quorum=tb-210,tb-205,tb-200
 
-  #optimize
-  #hbase.client.write.buffer=2097152
-  #hbase.client.retries.number=35
 ```
 
 #### 直接采用HomClient操作：
