@@ -8,7 +8,9 @@
 这种写法存在一些问题，比如针对每个po的curd操作，都需要写相应的代码构造hbase的PUT,GET,DELETE等对象非常繁琐;
 针对每个po，都需要写相应的代码处理hbase查询的结果集;每个po需要手动进行hbase和object之间的映射;每次都需要处理hbase的相关异常。
 
-因此决定写一个简单的HBASE和Java对象映射框架，通过注解配置po对象，提供基本的CURD功能，并提供方便的api，用户无需要关心hbase的存储细节，只需要关注自己的领域模型和(PO)和业务逻辑。
+因此决定写一个简单的HBASE和Java对象映射框架，通过注解配置po对象，提供基本的CURD功能，并提供方便的api，用户无需要关心hbase的存储细节
+，只需要关注自己的领域模型和(PO)和业务逻辑。
+
 
 ### 使用方法
 #### 在resource下提供hom4j.properties配置文件，主要提供hbase相关设置。常用配置：
@@ -17,9 +19,6 @@
   zookeeper.znode.parent=/hbase
   hbase.zookeeper.quorum=tb-210,tb-205,tb-200
 
-  #optimize
-  #hbase.client.write.buffer=2097152
-  #hbase.client.retries.number=35
 ```
 
 #### 直接采用HomClient操作：
