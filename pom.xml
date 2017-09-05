@@ -2,12 +2,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.ctrip</groupId>
-        <artifactId>super-pom</artifactId>
-        <version>1.0.0</version>
-    </parent>
-
     <groupId>com.github.dhc.framework</groupId>
     <artifactId>hom4j</artifactId>
     <version>1.0.0</version>
@@ -17,10 +11,6 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-        <releases.repo>http://maven.dev.sh.ctripcorp.com:8081/nexus/content/repositories/tourtailorrelease
-        </releases.repo>
-        <snapshots.repo>http://maven.dev.sh.ctripcorp.com:8081/nexus/content/repositories/tourtailorsnapshot
-        </snapshots.repo>
         <file_encoding>UTF-8</file_encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -182,19 +172,5 @@
 
         </plugins>
     </build>
-
-
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <name>Nexus Release Repository</name>
-            <url>${releases.repo}</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>${snapshots.repo}</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>
