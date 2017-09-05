@@ -42,6 +42,7 @@
 ```
 
 
+
 #### 直接采用HomClient操作：
 ```java
   homClient = new HomClient();
@@ -57,17 +58,17 @@
   book.setBookName("Thinking in java");
   book.setAuthor("hcdeng");
   book.setDesc("good book about java");
-  HCriteria.putCriteria(Book.class).putObject(book).build().execute(homClient);
-  HCriteria.putCriteria(Book.class).putList(Arrays.asList(book)).build().execute(homClient);
+   HomCriteria.putCriteria(Book.class).putObject(book).build().execute(homClient);
+   HomCriteria.putCriteria(Book.class).putList(Arrays.asList(book)).build().execute(homClient);
 
   //查找
-  Book book = HCriteria.findCriteria(Book.class).byRowKey(TypeParsers.toBytes(1234)).build().query(homClient);
+  Book book =  HomCriteria.findCriteria(Book.class).byRowKey(TypeParsers.toBytes(1234)).build().query(homClient);
 
   //聚合
-  long count = HCriteria.aggregateCriteria(Book.class).fromRow(TypeParsers.toBytes(1234)).toRow(TypeParsers.toBytes(1245)).build().count(homClient);
+  long count =  HomCriteria.aggregateCriteria(Book.class).fromRow(TypeParsers.toBytes(1234)).toRow(TypeParsers.toBytes(1245)).build().count(homClient);
 
   //删除
-  HCriteria.deleteCriteria(Book.class).byRowKey(TypeParsers.toBytes(1234)).build().execute(homClient);
+   HomCriteria.deleteCriteria(Book.class).byRowKey(TypeParsers.toBytes(1234)).build().execute(homClient);
 
 ```
 
