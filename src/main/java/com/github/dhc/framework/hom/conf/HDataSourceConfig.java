@@ -12,6 +12,7 @@ import java.util.Properties;
 
 /**
  * Created by hcdeng on 17-8-25.
+ * the configuration of hbase
  */
 public class HDataSourceConfig {
 

@@ -22,8 +22,8 @@ public class HomCriteria {
     }
 
     /**
-     * 构造一个用于插入记录的Criteria
-     * @param poType PO所属类型
+     * Construct a Criteria for putting records
+     * @param poType the the of po to be saved
      * @param <T>
      * @return
      */
@@ -32,8 +32,8 @@ public class HomCriteria {
     }
 
     /**
-     * 构造一个用于查询的Criteria
-     * @param poType PO所属类型
+     * Construct a Criteria for querying records
+     * @param poType the the of po to be queried
      * @param <T>
      * @return
      */
@@ -42,8 +42,8 @@ public class HomCriteria {
     }
 
     /**
-     * 构造一个用于删除记录的Criteria
-     * @param poType PO所属类型
+     * Construct a Criteria for deleting records
+     * @param poType the the of po to be deleted
      * @param <T>
      * @return
      */
@@ -52,8 +52,8 @@ public class HomCriteria {
     }
 
     /**
-     * 构造一个用于聚合的Criteria
-     * @param poType PO所属类型
+     * Construct a Criteria for aggregation operations
+     * @param poType the the of po to be queried
      * @param <T>
      * @return
      */
@@ -201,7 +201,7 @@ public class HomCriteria {
         }
 
         /**
-         * rowKey不能再为byte[]形式
+         * rowKey should not be byte array here
          * @param rowKey
          * @return
          */
@@ -216,7 +216,7 @@ public class HomCriteria {
         }
 
         /**
-         * rowKey不能再为byte[]形式
+         * rowKey should not be byte array here
          * @param rowKeys
          * @return
          */

@@ -6,7 +6,11 @@
 在开发中有个同步产品snapshot数据到hbase的需求，看了下其他项目里面相关功能的代码，发现这些项目在需要这样的功能时都会
 重新写一套增删查改hbase的代码，调用最原始的hbase api，这种写法和java里面直接使用最原始的jdbc api操作数据库很像。
 这种写法存在一些问题，比如针对每个po的curd操作，都需要写相应的代码构造hbase的PUT,GET,DELETE等对象非常繁琐;
-针对每个po，都需要写相应的代码处理hbase查询的结果集;每个po需要手动进行hbase和object之间的映射;每次都需要处理hbase的相关异常。
+针对每个po，都需要写相应的代码处理hbase查询的结果集;每个po需要手动进行hbase和object之间的映射;每次都需要处理hbase的相关异常。   
+
+
+显然这种做法很不优雅。   
+
 
 因此决定写一个简单的HBASE和Java对象映射框架，通过注解配置po对象，提供基本的CURD功能，并提供方便的api，用户无需要关心hbase的存储细节
 ，只需要关注自己的领域模型和(PO)和业务逻辑。
@@ -41,7 +45,14 @@
     }
 ```
 
-
+#### 关于```RowKey```
+- 必须要有一个字段注解为```RowKey```,否则会异常
+- 为了方便自动生成, ```RowKey```字段的类型必须为```int.class, Integer.class,long.class, Long.class, BigInteger.class, String.class```其中一种，否则异常
+- 可以自己设置```Rowkey```， 不推荐
+- 自动生成```RowKey``` ```@RowKey(auto = true)```， 不指定```RowKeyProvider```的话，会根据系统时间自动生成
+- 自定义```RowKey```自动生成策略 ```provider = {SnapshotRowkeyGenrator.class}```, 其中```SnapshotRowkeyGenrator```必须继承```RowkeyProvider```
+- 推荐使用第三种方式
+- [RowKey设计原则参考](http://dxer.github.io/2016/06/16/hbase_rowkey/)
 
 #### 直接采用HomClient操作：
 ```java
@@ -75,4 +86,6 @@
 #### 更多细节
 - 详细用法请参考Test Case
 - 源码底下无秘密
+
+## May you enjoy using **HOM4J** ~~
 

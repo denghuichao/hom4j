@@ -46,5 +46,4 @@ public class AggregationOperation<T> extends Operation<T> {
     public void setCloumnName(String cloumnName) {
         this.cloumnName = cloumnName;
     }
-
 }

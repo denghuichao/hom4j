@@ -1,5 +1,6 @@
 package com.github.dhc.framework.hom.pos;
 
+import com.github.dhc.framework.hom.SnapshotRowkeyGenrator;
 import com.github.dhc.framework.hom.annotation.Column;
 import com.github.dhc.framework.hom.annotation.RowKey;
 import com.github.dhc.framework.hom.annotation.Table;
@@ -13,7 +14,7 @@ import java.util.Calendar;
 @Table("SchemeSnapShort")
 public class SchemeSnapshot {
 
-    @RowKey(auto = true)
+    @RowKey(auto = true, provider = {SnapshotRowkeyGenrator.class})
     public Long snapShortID;
 
     @Column(family = "cf")

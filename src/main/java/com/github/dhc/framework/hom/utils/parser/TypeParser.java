@@ -17,13 +17,6 @@ public abstract class TypeParser<T> {
      */
   protected abstract   T bytesToObject(byte[] bytes);
 
-    /**
-     * 将对象转换成byte[]
-     *
-     * @param object
-     */
-    protected abstract  byte[] objectToBytes(T object);
-
     public final T fromBytes(byte[] bytes) {
         if (canParseFromBytes(bytes))
             return bytesToObject(bytes);
@@ -37,6 +30,13 @@ public abstract class TypeParser<T> {
 
         throw new IllegalArgumentException(object.getClass() + " doesn't match type " + getGenericType());
     }
+
+    /**
+     * 将对象转换成byte[]
+     *
+     * @param object
+     */
+    protected abstract  byte[] objectToBytes(T object);
 
     protected boolean canParseToBytes(Object o) {
         return getGenericType() == o.getClass();

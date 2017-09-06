@@ -7,11 +7,9 @@
 package com.github.dhc.framework.hom.exception;
 
 /**
- * 功能描述:  <p>
- *
- * @author : huichaodeng <p>
+ * @author : huichaodeng
  * @version 1.0 2017-08-28
- * @since horm 1.0
+ * @since hom 1.0
  */
 public class RowKeyNotDefineException extends HomException{
 

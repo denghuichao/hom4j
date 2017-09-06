@@ -6,6 +6,7 @@ import com.github.dhc.framework.hom.hbase.HColumnDefinition;
 import com.github.dhc.framework.hom.hbase.HTableDefinition;
 import com.github.dhc.framework.hom.exception.NotATableException;
 import com.github.dhc.framework.hom.exception.RowKeyNotDefineException;
+import com.github.dhc.framework.hom.hbase.RowkeyProvider;
 import com.github.dhc.framework.hom.utils.parser.TypeParsers;
 import com.google.common.base.Strings;
 
@@ -51,6 +52,9 @@ public final class HBaseUtil {
         tableDefinition.setPoType(poType);
         tableDefinition.setRowKey(getRowKeyInner(hcds));
         tableDefinition.setTableName(Strings.isNullOrEmpty(tName) ? poType.getName() : tName);
+
+        tableDefinition.setRowkeyProvider(getRowKeyProvider(tableDefinition));
+
         HCDS.put(poType, tableDefinition);
 
         return tableDefinition;
@@ -73,6 +77,16 @@ public final class HBaseUtil {
         }
 
         return rowkey;
+    }
+
+    private static Class<? extends RowkeyProvider<?, ?>> getRowKeyProvider(HTableDefinition tableDefinition) {
+        Class<? extends RowkeyProvider<?, ?>>[] providers = tableDefinition.getRowKey().getField()
+                .getAnnotation(RowKey.class).provider();
+        if (providers != null && providers.length > 0) {
+            return providers[0];
+        }
+
+        return null;
     }
 
     public static <T> HColumnDefinition getRowKey(T po) {
@@ -110,14 +124,19 @@ public final class HBaseUtil {
         throw new NullPointerException("po must not be null");
     }
 
-    public static <T> byte[] getRowKeyBytes(T po) {
+    public static <T> byte[] getRowKeyBytes(T po, boolean read) {
         if (po != null) {
             HColumnDefinition rk = getRowKey(po);
+            HTableDefinition htd = HCDS.get(po.getClass());
             try {
                 Object o = rk.getField().get(po);
 
-                if (o == null && rk.getField().getAnnotation(RowKey.class).auto()) {
-                    o = autoGenerateRowKey(rk);
+                if (o == null && !read && rk.getField().getAnnotation(RowKey.class).auto()) {
+                    RowkeyProvider rowkeyProvider = htd.getRowkeyProvider();
+                    if (rowkeyProvider != null)
+                        o = rowkeyProvider.generateRowkey(po);
+                    else
+                        o = autoGenerateRowKey(rk);
                 }
 
                 if (o == null) throw new NullPointerException("rowkey must not be null");
@@ -128,6 +147,11 @@ public final class HBaseUtil {
             }
         }
         throw new NullPointerException("po must not be null");
+    }
+
+
+    public static <T> byte[] getRowKeyBytes(T po){
+        return getRowKeyBytes(po, false);
     }
 
     private static Object autoGenerateRowKey(HColumnDefinition rk) {
@@ -151,9 +175,9 @@ public final class HBaseUtil {
         }
     }
 
-    public static  <T> byte[] objectToRowkey(Object rowKey, Class<T> poType){
+    public static <T> byte[] objectToRowkey(Object rowKey, Class<T> poType) {
         HColumnDefinition rowKeyHcd = getRowKey(poType);
-        if(rowKey.getClass() != rowKeyHcd.getFieldType()) {
+        if (rowKey.getClass() != rowKeyHcd.getFieldType()) {
             throw new IllegalArgumentException("rowKey should be " +
                     rowKeyHcd.getFieldType().getName() + ", " +
                     "but actual is " + rowKey.getClass().getName());
@@ -161,7 +185,7 @@ public final class HBaseUtil {
         return TypeParsers.toBytes(rowKey);
     }
 
-    public static  <T> List<byte[]> objectsToRowkeys(List<?> rowKeys, Class<T> poType){
+    public static <T> List<byte[]> objectsToRowkeys(List<?> rowKeys, Class<T> poType) {
         return rowKeys.stream().map(e -> objectToRowkey(e, poType)).collect(Collectors.toList());
     }
 }

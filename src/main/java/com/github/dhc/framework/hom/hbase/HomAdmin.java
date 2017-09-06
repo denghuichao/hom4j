@@ -12,7 +12,7 @@ import java.io.IOException;
 
 /**
  * Created by hcdeng on 17-8-28.
- * 用于创建和删除表
+ * this class is for creating, deleting tables and other administration functions
  */
 public class HomAdmin implements HDataSourceAware, HSchema {
 

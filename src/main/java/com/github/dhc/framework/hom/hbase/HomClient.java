@@ -57,7 +57,6 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
         this.hDataSource = dataSource;
     }
 
-
     @Override
     public long count(byte[] startRow, byte[] endRow, Class<?> po, Filter... filters) {
 
@@ -73,6 +72,17 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
         } catch (Throwable e) {
             throw new HomException(e);
         }
+    }
+
+    @Override
+    public long count(Object startRow, Object endRow, Class<?> poType, Filter... filters) {
+        if (startRow == null || endRow == null || poType == null)
+            throw new IllegalArgumentException("po rowkeys and poType must not be null");
+
+        byte[] start = HBaseUtil.objectToRowkey(startRow, poType);
+        byte[] end = HBaseUtil.objectToRowkey(endRow, poType);
+
+        return count(start, end, poType, filters);
     }
 
     private Scan buildScan(byte[] startRow, byte[] endRow, int pageSize, Filter... filters) {
@@ -120,6 +130,17 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
         } catch (Throwable e) {
             throw new HomException(e);
         }
+    }
+
+    @Override
+    public double sum(Object startRow, Object endRow, Class<?> poType, String columnName, Filter... filters) {
+        if (startRow == null || endRow == null || poType == null)
+            throw new IllegalArgumentException("po rowkeys and poType must not be null");
+
+        byte[] start = HBaseUtil.objectToRowkey(startRow, poType);
+        byte[] end = HBaseUtil.objectToRowkey(endRow, poType);
+
+        return sum(start, end, poType, columnName, filters);
     }
 
     private void indicateColumnToAggregate(Class<?> po, String propertyName, Scan scan)
@@ -213,12 +234,6 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
     public <T> T queryOne(Object rowKey, Class<T> poType) {
         if (rowKey == null || poType == null)
             throw new IllegalArgumentException("po rowkey and poType must not be null");
-
-        HColumnDefinition rowKeyHcd = HBaseUtil.getRowKey(poType);
-        if(rowKey.getClass() != rowKeyHcd.getFieldType())
-            throw new IllegalArgumentException("rowKey should be "+
-                    rowKeyHcd.getFieldType().getName()+", " +
-                    "but actual is "+rowKey.getClass().getName());
 
         return queryOne(HBaseUtil.objectToRowkey(rowKey, poType), poType);
     }
@@ -399,7 +414,7 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
         if (poList.size() > 0) {
             Class<?> type = poList.get(0).getClass();
             List<byte[]> rowKeys = Lists.newArrayList();
-            poList.forEach(t -> rowKeys.add(HBaseUtil.getRowKeyBytes(t)));
+            poList.forEach(t -> rowKeys.add(HBaseUtil.getRowKeyBytes(t, true)));
             deleteList(rowKeys, type);
         }
     }

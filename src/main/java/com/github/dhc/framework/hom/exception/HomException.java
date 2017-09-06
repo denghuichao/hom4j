@@ -2,7 +2,7 @@ package com.github.dhc.framework.hom.exception;
 
 /**
  * Created by hcdeng on 17-8-25.
- * HORM框架向外抛出的异常
+ * Base exception the hom framework throws out
  */
 public class HomException extends RuntimeException{
 

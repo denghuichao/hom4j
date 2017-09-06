@@ -7,19 +7,22 @@ import java.lang.annotation.Target;
 
 /**
  * Created by hcdeng on 17-8-25.
- * 功能描述：Hbase列映射注解
+ * Desc: this annotation maps the po(Persistent objects) fields to htable columns
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Column {
 
     /**
-     * 映射的Hbase列族
+     * the column family the field maps to
+     * for every field which maps to htable, family must be set
      */
     String family()  default "";
 
     /**
-     * 映射的HBase列名
+     * the column ths field maps to
+     * when name is not set with a not-empty value, the field maps to the column
+     * whose name equals to the field name
      */
     String name() default "";
 }
