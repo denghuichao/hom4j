@@ -38,7 +38,10 @@ public final class PoExtractor {
                     if(!hcd.getIsRowkey()) {
                         Cell cell = result.getColumnLatestCell(TypeParsers.toBytes(hcd.getColumnFamily()),
                                 TypeParsers.toBytes(hcd.getColummName()));
-                        hcd.getField().set(t, TypeParsers.fromBytes(hcd.getFieldType(), CellUtil.cloneValue(cell)));
+                        byte[] cellBytes = CellUtil.cloneValue(cell);
+                        if(cellBytes != null){
+                            hcd.getField().set(t, TypeParsers.fromBytes(hcd.getFieldType(), cellBytes));
+                        }
                     }
                 }
                 res.add(t);
