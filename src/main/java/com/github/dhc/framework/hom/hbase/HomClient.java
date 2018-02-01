@@ -275,15 +275,21 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
         if (fromRowKey == null || endRowKey == null || poType == null)
             throw new IllegalArgumentException("po rowkeys and poType must not be null");
 
+        ResultScanner scanner = null;
         try {
             Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType));
             Scan scan = buildScan(fromRowKey, endRowKey, PAGE_SIZE_NO_LIMIT);
-            ResultScanner scanner = table.getScanner(scan);
+            scanner = table.getScanner(scan);
             List<T> res = Lists.newArrayList();
             scanner.forEach(e -> res.add(PoExtractor.extract(e, poType)));
             return res;
         } catch (IOException e) {
             throw new HomException(e);
+        }
+        finally {
+            if(scanner != null){
+                scanner.close();
+            }
         }
     }
 
@@ -305,6 +311,7 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
             throw new IllegalArgumentException("kvs and poType must not be null");
 
         List<T> resultList = Lists.newArrayList();
+        ResultScanner scanner = null;
         try {
             Table table = getHDataSource().getTable(HBaseUtil.getHTableName(poType));
             FilterList filterList = new FilterList();
@@ -323,12 +330,16 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
 
             scan.setFilter(filterList);
             scan.setReversed(true);
-            ResultScanner scanner = table.getScanner(scan);
+            scanner = table.getScanner(scan);
             scanner.forEach(e -> resultList.add(PoExtractor.extract(e, poType)));
 
             return resultList;
         }catch (IOException e){
             throw new HomException(e);
+        }finally {
+            if(scanner != null){
+                scanner.close();
+            }
         }
     }
 
@@ -338,9 +349,11 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
         Scan scan = buildScan(hPager.getStartRow(), hPager.getStopRow(), hPager.getPageSize(), filters);
         List<T> resultList = Lists.newArrayList();
 
+        ResultScanner scanner = null;
+
         try {
             Table table = getHDataSource().getTable(HBaseUtil.getHTableName(hPager.getRecordType()));
-            ResultScanner scanner = table.getScanner(scan);
+            scanner = table.getScanner(scan);
             scanner.forEach(e -> resultList.add((T) PoExtractor.extract(e, hPager.getRecordType())));
             hPager.setRecordList(resultList);
             if (resultList != null && resultList.size() > 0) {
@@ -353,6 +366,10 @@ public class HomClient implements HDataSourceAware, HAggregator, HPersistent {
             return hPager;
         } catch (IOException e) {
             throw new HomException(e);
+        }finally {
+            if(scanner != null){
+                scanner.close();
+            }
         }
     }
 
