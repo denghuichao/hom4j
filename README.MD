@@ -85,7 +85,6 @@
 
 #### 更多细节
 - 详细用法请参考Test Case
-- 源码底下无秘密
 
 ## May you enjoy using **HOM4J** ~~
 
