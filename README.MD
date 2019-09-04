@@ -20,7 +20,7 @@
 #### 在resource下提供hom4j.properties配置文件，主要提供hbase相关设置。常用配置：
 ```java
     zookeeper.znode.parent=/hbase_online_new
-    hbase.zookeeper.quorum=10.28.65.19,10.28.65.18,10.28.65.8
+    hbase.zookeeper.quorum=10.***.***.19,10.***.***.18,10.***.***.8
 ```
 
 #### 采用注解的方式定义Po和HTable的映射关系：
